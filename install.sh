@@ -1,5 +1,17 @@
 #!/bin/bash
 
+
+util_index_theme_inherits_set () {
+
+  local inherits_value="${1}"
+  local index_theme_file_path="${2}"
+
+  sed -i "s|^Inherits=.*|Inherits=${inherits_value}|g" "${index_theme_file_path}"
+
+  return 0
+}
+
+
 ROOT_UID=0
 DEST_DIR=
 
@@ -31,6 +43,9 @@ install() {
 
   local THEME_DIR=${dest}/${name}${theme}${color}
 
+  local inherits_light="Numix-Circle-Light,Numix-Light,Papirus-Light,Adwaita,hicolor"
+  local inherits_dark="Numix-Circle,Numix,Papirus-Dark,Adwaita,hicolor"
+
   [[ -d ${THEME_DIR} ]] && rm -rf ${THEME_DIR}
 
   echo "Installing '${THEME_DIR}'..."
@@ -42,6 +57,7 @@ install() {
 
   cd ${THEME_DIR}
   sed -i "s/${name}/${name}${theme}${color}/g" index.theme
+  util_index_theme_inherits_set "${inherits_light}" index.theme
 
   if [[ ${color} == '' ]]; then
     mkdir -p                                                                           ${THEME_DIR}/32
@@ -55,6 +71,8 @@ install() {
   fi
 
   if [[ ${color} == '-dark' ]]; then
+    util_index_theme_inherits_set "${inherits_dark}" index.theme
+
     mkdir -p                                                                           ${THEME_DIR}/16
     mkdir -p                                                                           ${THEME_DIR}/22
     mkdir -p                                                                           ${THEME_DIR}/24
@@ -140,6 +158,9 @@ while [[ $# -gt 0 ]]; do
       ;;
     -red)
       theme="-red"
+      ;;
+    -purple)
+      theme="-purple"
       ;;
     -h|--help)
       usage
